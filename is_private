@@ -1,0 +1,27 @@
+#!/usr/bin/env zsh
+typeset -ga PRIVATE_RANGES=(
+    00001010           # 10.0.0.0/8
+    101011000001       # 172.16.0.0/12
+    1100000010101000   # 192.168.0.0/16
+)
+
+test_range() {
+    typeset net addr=$(printf '%.2x' ${(s:.:)1})
+    for net in $PRIVATE_RANGES; do
+        ((16#$addr >> (32 - $#net) == 2#$net)) && return 0
+    done
+}
+
+report() {
+    typeset result='private' addr=$1 state=$2
+    ((state)) && result='not private'
+    printf "%s is %s\n" $addr $result
+    exit $state
+}
+
+main() {
+    test_range $1 && report $1 0
+    report $1 1
+}
+
+main $@
