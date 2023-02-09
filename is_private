@@ -24,4 +24,4 @@ main() {
     report $1 1
 }
 
-main $@
+main $1
