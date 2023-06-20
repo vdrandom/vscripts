@@ -2,26 +2,24 @@
 ###
 # https://github.com/microsoft/cascadia-code
 # ss01 - handwritten italic
-# ss02 - lua not equal ~= - does not work :(
+# ss02 - lua not equals ~=
 # ss03 - serbian locale
 # ss19 - slashed zero 0
 # ss20 - graphical control characters
 ###
+# opentype-feature-freezer is necessary, install with pipx or pip
+# pip install --upgrade opentype-feature-freezer
+###
 
-arch=vcascadia.tgz
+name=VascadiaMod
+arch=$name.tgz
+ss=ss01,ss19,ss20
 
-nsrc=CascadiaCodePL.ttf
-ndst=normal.ttf
-nss=ss19,ss20
+for font in CascadiaCodePL*.otf; do
+    src=$font
+    dst=${font/CascadiaCodePL/$name}
 
-isrc=CascadiaCodePLItalic.ttf
-idst=italic.ttf
-iss=ss01,$nss
+    pyftfeatfreeze -f $ss -R "Cascadia Code PL/$name" $src $dst
+done
 
-rm -fv $arch $ndst $idst
-
-pip install --upgrade opentype-feature-freezer
-pyftfeatfreeze -f $nss -R 'Cascadia Code PL/vcascadia' $nsrc $ndst
-pyftfeatfreeze -f $iss -R 'Cascadia Code PL/vcascadia' $isrc $idst
-
-tar -acvf $arch $ndst $idst
+eval tar -acvf $arch $name*
