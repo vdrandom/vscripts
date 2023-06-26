@@ -2,7 +2,7 @@
 # a simple script to test 24 bit compatibility in a terminal
 # source: https://gist.github.com/XVilka/8346728
 BEGIN{
-    s="▀▀▀▀▀▀▀▀▀▀"; s=s s s s s s s s;
+    s="=========="; s=s s s s s s s s;
     for (colnum = 0; colnum<77; colnum++) {
         r = 255-(colnum*255/76);
         g = (colnum*510/76);
