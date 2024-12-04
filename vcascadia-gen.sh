@@ -8,18 +8,20 @@
 # ss20 - graphical control characters
 ###
 # opentype-feature-freezer is necessary, install with pipx or pip
-# pip install --upgrade opentype-feature-freezer
+# pipx install --upgrade opentype-feature-freezer
 ###
 
+title='Cascadia Mono NF'
+orig=CascadiaMonoNF
 name=VascadiaMod
 arch=$name.tgz
 ss=ss01,ss19,ss20
 
-for font in CascadiaMonoNF*.otf; do
+for font in $orig*.otf; do
     src=$font
-    dst=${font/CascadiaMonoNF/$name}
+    dst=${font/$orig/$name}
 
-    pyftfeatfreeze -f $ss -R "Cascadia Code PL/$name" $src $dst
+    pyftfeatfreeze -f $ss -R "$title/$name" $src $dst
 done
 
 eval tar -acvf $arch $name*
