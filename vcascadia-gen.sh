@@ -15,9 +15,9 @@ name=VascadiaMod
 arch=$name.tgz
 ss=ss01,ss19,ss20
 
-for font in CascadiaCodePL*.otf; do
+for font in CascadiaMonoNF*.otf; do
     src=$font
-    dst=${font/CascadiaCodePL/$name}
+    dst=${font/CascadiaMonoNF/$name}
 
     pyftfeatfreeze -f $ss -R "Cascadia Code PL/$name" $src $dst
 done
