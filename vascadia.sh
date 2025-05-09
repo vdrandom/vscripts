@@ -1,17 +1,26 @@
 #!/usr/bin/env zsh
 ###
+# This script generates an archive with "baked in" stylistic sets
+# for the best compatibility.
+###
+# opentype-feature-freezer is necessary, installed automatically via uv
+###
 # https://github.com/microsoft/cascadia-code
-# ss01 - handwritten italic
+# calt,ss01 - handwritten italic
 # ss02 - lua not equals ~=
 # ss03 - serbian locale
 # ss19 - slashed zero 0
 # ss20 - graphical control characters
 ###
-# opentype-feature-freezer is necessary, install with pipx or pip
-# pip install --upgrade opentype-feature-freezer
-###
-# This script generates an archive with "baked in" stylistic sets
-# for the best compatibility.
+# VARIANT is a find wildcard, so use it wisely
+# e.g. VARIANT='*MonoPL*.otf', VARIANT='*Code*.ttf', VARIANT='*'
+# Font variants:
+# Code - ligatures, no extras
+# Mono - no ligatures, no extras
+#   PL - powerline symbols (CodePL, MonoPL)
+#   NF - powerline + NerdFont symbols (CodeNF, MonoNF)
+# .ttf - truetype fonts
+# .otf - opentype fonts
 ###
 
 VERSION=2407.24
@@ -19,48 +28,41 @@ VERSION=2407.24
 NAME=Vascadia
 WDIR=$HOME/vascadia
 
-SS=ss01,ss02,ss19,ss20
+SS=calt,ss01,ss19,ss20
+VARIANT='*MonoPL*.otf'
 
 SRC=CascadiaCode-$VERSION.zip
 URL=https://github.com/microsoft/cascadia-code/releases/download/v$VERSION/$SRC
 
 function prep {
-    typeset archive=$WDIR/$SRC
-    mkdir -p $WDIR
-    [[ -r $archive ]] || wget -P $WDIR $URL
-    unzip $archive 'otf/**' -d $WDIR
-}
-
-function venv {
-    typeset venv_dir=$WDIR/.venv
-    python3 -m venv $venv_dir
-    source $venv_dir/bin/activate
-    pip install --upgrade pip opentype-feature-freezer
+    [[ -r $SRC ]] || wget $URL
+    unzip $SRC 'otf/**'
+    uv venv
+    uv pip install opentype-feature-freezer
 }
 
 function convert {
-    typeset dst_dir=$WDIR/$NAME
-    mkdir -p $dst_dir
+    mkdir -p $NAME
     while read -r src; do
-        # an ugly hack to replace C with V, don't judge me
-        dst=V${src##*/C}
+        dst=$NAME/$(basename ${src//Cascadia/$NAME})
 
-        pyftfeatfreeze -f $SS -R Cascadia/$NAME $src $dst_dir/$dst
+        uv run pyftfeatfreeze -f $SS -R Cascadia/$NAME $src $dst
     done
 }
 
 function cleanup {
-    typeset source=$WDIR/$NAME
+    typeset source=$NAME
     typeset archive=$source-$VERSION.zip
     zip -rv $archive $source
-    rm -rv $source $WDIR/otf
+    rm -rv $source otf
 }
 
 function main {
     set -ex
+    mkdir -p $WDIR
+    cd $WDIR
     prep
-    venv
-    convert < <(find $WDIR/otf -type f -name '*.otf')
+    convert < <(find otf -type f -name $VARIANT)
     cleanup
 }
 
