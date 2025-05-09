@@ -29,7 +29,7 @@ NAME=Vascadia
 WDIR=$HOME/vascadia
 
 SS=calt,ss01,ss19,ss20
-VARIANT='*MonoPL*.otf'
+VARIANT='*Mono*.otf'
 
 SRC=CascadiaCode-$VERSION.zip
 URL=https://github.com/microsoft/cascadia-code/releases/download/v$VERSION/$SRC
